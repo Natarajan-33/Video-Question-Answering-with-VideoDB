@@ -1,61 +1,75 @@
 import streamlit as st
-from db_utils import upload_videos_to_database, getanswer
+from database_operations import add_videos_to_index, find_related_content_by_query
+from advanced_language_model import generate_answer_from_context
+
 
 st.set_page_config(
-    page_title="Youtube Video Query Bot🤖", layout="wide", initial_sidebar_state="auto"
+    page_title="Video Insight Bot🤖", layout="wide", initial_sidebar_state="auto"
 )
 
-def initialize_session_state():
-    if "messages" not in st.session_state.keys():
-        st.session_state.messages = [
-            {"role": "assistant", "content": "Hi! Now, you can query over provided video contents. Shot the questions"}
+def setup_session_variables():
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = [
+            {"role": "bot", "message": "Hello! Feel free to search through the video content. What's your question?"}
         ]
 
-    if "youtube_links" not in st.session_state.keys():
-        st.session_state.youtube_links = []
+    if "video_urls" not in st.session_state:
+        st.session_state.video_urls = []
 
-    if "links_submitted" not in st.session_state.keys():
-        st.session_state.links_submitted = False
+    if "urls_stored" not in st.session_state:
+        st.session_state.urls_stored = False
 
-initialize_session_state()
+setup_session_variables()
 
-st.header("Enter the YouTube Video Link")
-if not st.session_state.links_submitted:
-    youtube_link = st.text_input("",placeholder= "Enter here" ,  label_visibility="collapsed")
-    if st.button("Add youTube link to collection"):
-        st.session_state.youtube_links.append(youtube_link)
-        st.success(f"YouTube link {youtube_link} added successfully!")
-        youtube_link = ""
+if not st.session_state.urls_stored:
+    st.header("Provide the YouTube Video URL")
+    video_url = st.text_input("", placeholder="Paste here", label_visibility="collapsed")
+    if st.button("Add Video URL to Library"):
+        st.session_state.video_urls.append(video_url)
+        st.success(f"Video URL {video_url} added! Add more if you like.")
+        video_url = ""
 
-    if st.button("Submit all youTube links to database engine"):
-        st.session_state.links_submitted = True
-        with st.spinner("Uploading and Indexing Video"):
-            upload_videos_to_database(st.session_state.youtube_links)
-            st.success("All youtube links has uploaded and indexed successfully!")
+    if st.button("Save All Video URLs to Database"):
+        st.session_state.urls_stored = True
+        with st.spinner("Uploading Videos and Indexing..."):
+            add_videos_to_index(st.session_state.video_urls)
+            st.success("Videos uploaded and indexed successfully!")
 else:
-    st.success("The provided youtube links has been submitted and stored.")
+    st.success("Video URLs have been successfully saved.")
 
-st.divider()
-if st.session_state.links_submitted:
-    st.title("Youtube Video Query Bot🤖")
+# st.divider()
 
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
+selected_service = st.sidebar.radio(
+    "Select a Service:",
+    ["LLM Summary", "Stream Full Video", "Search and Watch Clip", "Get Transcript", "Add Subtitles", "Generate Thumbnail"],
+    captions=["Summarized Response", "Stream Video", "Watch Related Short Clips", "Video Transcript", "Watch with Subtitles", "Create Video Thumbnail"])
 
-    if user_query := st.chat_input("Enter query"):
-        st.session_state.messages.append({"role": "user", "content": user_query})
+
+if selected_service == "LLM Summary" and st.session_state.urls_stored:
+    st.header(selected_service)
+    st.title("Video Insight Bot🤖")
+
+    for entry in st.session_state.chat_history:
+        with st.chat_message(entry["role"]):
+            st.write(entry["message"])
+
+    query = st.chat_input("What would you like to know?")
+    if query:
+        st.session_state.chat_history.append({"role": "user", "message": query})
         with st.chat_message("user"):
-            st.write(user_query)
+            st.write(query)
 
-    if st.session_state.messages[-1]["role"] != "assistant":
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking🤔"):
-                res_box = st.empty()
-                final_response, matching_videos = getanswer(user_query)
-            res_box.write(f"{final_response}")
+    if st.session_state.chat_history[-1]["role"] != "bot":
+        with st.chat_message("bot"):
+            with st.spinner("Analyzing..."):
+                response_placeholder = st.empty()
+                search_context, details = find_related_content_by_query(query)
+                response = ""
+                response = generate_answer_from_context(query, search_context)
+            response_placeholder.write(response)
 
-            st.session_state.messages.append({"role": "assistant", "content": final_response})
+            st.session_state.chat_history.append({"role": "bot", "message": response})
 
-        with st.expander(f"Context Details"):
-                st.write(matching_videos)
+        with st.expander("Context and Details"):
+            st.write(details)
+
