@@ -1,5 +1,5 @@
 import streamlit as st
-from database_operations import add_videos_to_index, find_related_content_by_query
+from database_operations import add_videos_to_index, find_related_content_by_query, stream_video, watch_shorts, transcribe_video, add_subtitles, thumbnail, delete_video_from_index
 from advanced_language_model import generate_answer_from_context
 
 
@@ -41,11 +41,12 @@ else:
 
 selected_service = st.sidebar.radio(
     "Select a Service:",
-    ["LLM Summary", "Stream Full Video", "Search and Watch Clip", "Get Transcript", "Add Subtitles", "Generate Thumbnail"],
-    captions=["Summarized Response", "Stream Video", "Watch Related Short Clips", "Video Transcript", "Watch with Subtitles", "Create Video Thumbnail"])
+    ["***LLM Summary***", "***Stream Full Video***", "***Search and Watch Clip***", "***Get Transcript***", "***Add Subtitles***", "***Generate Thumbnail***","***Delete Video***"],
+    captions=["Summarized Response", "Stream Video", "Watch Related Short Clips", "Video Transcript", "Watch with Subtitles", "Create Video Thumbnail","Delete the Video"])
 
 
-if selected_service == "LLM Summary" and st.session_state.urls_stored:
+
+if selected_service == "***LLM Summary***" and st.session_state.urls_stored:
     st.header(selected_service)
     st.title("Video Insight Bot🤖")
 
@@ -72,4 +73,20 @@ if selected_service == "LLM Summary" and st.session_state.urls_stored:
 
         with st.expander("Context and Details"):
             st.write(details)
+
+
+if selected_service == "***Stream Full Video***" and st.session_state.urls_stored:
+    st.header(selected_service)
+    video_link = st.selectbox("Select URL to stream it", st.session_state.video_urls, placeholder="Choose an option", disabled=False, label_visibility="visible")
+    if video_link:
+        stream_video(video_url)
+
+
+if selected_service == "***Search and Watch Clip***" and st.session_state.urls_stored:
+    video_link = st.selectbox("Select URL to stream it", st.session_state.video_urls, placeholder="Choose an option", disabled=False, label_visibility="visible")
+    topic = st.text_input("Enter the topic to get shorts relevant to that", placeholder="ask here", label_visibility="visible")
+    if video_link:
+        watch_shorts(video_url, topic)  
+
+
 

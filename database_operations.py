@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from videodb import connect
+from videodb import connect, SearchType, play_stream
 
 load_dotenv()
 
@@ -30,4 +30,17 @@ def find_related_content_by_query(query):
     except Exception as error:
         print(f"Search failed for query '{query}'. Error: {error}")
         return "", {}
+    
+
+def stream_video(video_url):
+    video = connection.upload(url=video_url)
+    video.generate_stream()
+    video.play()
+
+def watch_shorts(video_url, topic):
+    video = connection.upload(url=video_url)
+    result = video.search(topic, search_type= SearchType.semantic)
+    result.play()
+
+
 
