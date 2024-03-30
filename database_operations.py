@@ -39,8 +39,32 @@ def stream_video(video_url):
 
 def watch_shorts(video_url, topic):
     video = connection.upload(url=video_url)
-    result = video.search(topic, search_type= SearchType.semantic)
-    result.play()
+    video.index_spoken_words()
+    result = video.search(query=topic)
+    return result
 
+def transcribe_video(video_url):
+    video = connection.upload(url=video_url)
+    # get text of the spoken content
+    # text_json = video.get_transcript()
+    text = video.get_transcript_text()
+    return text
 
+def add_subtitles(video_url):
+    video = connection.upload(url=video_url)
+    video.index_spoken_words()
+    new_stream = video.add_subtitle()
+    play_stream(new_stream)
 
+def thumbnail(video_url):
+    video = connection.upload(url=video_url)
+    return video.generate_thumbnail()
+
+def delete_video_from_index(video_url):
+    video = connection.upload(url=video_url)
+    video.delete()
+
+def delete_all_videos_from_index():
+    coll = connection.get_collection()
+    for video in coll.get_videos():
+        video.delete()
