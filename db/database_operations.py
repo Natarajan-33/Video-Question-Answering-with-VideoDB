@@ -97,4 +97,3 @@ def show_collection(collection):
     for video in collection.get_videos():
         videos_list.append(video)
     return videos_list
-

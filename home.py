@@ -1,6 +1,6 @@
 import streamlit as st
-from database_operations import add_videos_to_index, chat_with_video, stream_video, watch_shorts, transcribe_video, add_subtitles, thumbnail, delete_video_from_index, delete_all_videos_from_index, show_collection
-from advanced_language_model import generate_answer_from_context
+from db.database_operations import add_videos_to_index, chat_with_video, stream_video, watch_shorts, transcribe_video, add_subtitles, thumbnail, delete_video_from_index, delete_all_videos_from_index, show_collection
+from llm.advanced_language_model import generate_answer_from_context
 
 
 st.set_page_config(
@@ -9,9 +9,6 @@ st.set_page_config(
 
 st.sidebar.title("Video Insight Bot🤖")
 st.sidebar.divider()
-
-
-
 
 
 def setup_session_variables():
@@ -213,3 +210,6 @@ if st.sidebar.button("Check collection") and st.session_state.collection_variabl
 
 # metadata for video selection instead of URL
 # try playing shots videos
+
+
+
