@@ -12,21 +12,25 @@ connection = connect(api_key=videodb_api_key)
 
 def add_videos_to_index(collection_name, youtube_urls):
     video_dict = {}
-    collection = connection.create_collection(name =collection_name, description = collection_name)
+    collection = connection.create_collection(name=collection_name, description=collection_name)
     """Uploads videos to the database and indexes their spoken words."""
-    for url in youtube_urls:
-        try:
-            video = collection.upload(url=url)
-            video_dict[video.name] = video.id
-            st.write(f"Video: {video.name}({url}) uploaded successfully.")
+    with st.spinner('Uploading videos...'):
+        for url in youtube_urls:
+            try:
+                video = collection.upload(url=url)
+                video_dict[video.name] = video.id
             
-        except Exception as error:
-            st.write(f"Failed to upload and index {url}. Error: {error}")
-            return None , None
-        
-    for video in collection.get_videos():
-        video.index_spoken_words()
-        st.write(f"Indexed spoken words in: {video.name}.")
+                
+            except Exception as error:
+                st.write(f"Failed to upload and index {url}. Error: {error}")
+                return None , None
+    
+    with st.spinner('Indexing spoken words...'):
+        for video in collection.get_videos():
+            video.index_spoken_words()
+            
+    with st.expander(f"Details for {video.name}"):
+        st.write(f"Video: {video.name}({url}) uploaded and indexed successfully.")
         
     return video_dict, collection
 

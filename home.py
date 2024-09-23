@@ -10,7 +10,6 @@ st.set_page_config(
 st.sidebar.title("Video Insight Bot🤖")
 st.sidebar.divider()
 
-
 def setup_session_variables():
     # if "chat_history" not in st.session_state:
     #     st.session_state.chat_history = [
@@ -32,22 +31,20 @@ def setup_session_variables():
         st.session_state.chat_histories = {}  # Stores chat histories for each video
 
 
-
-
 setup_session_variables()
 
 if not st.session_state.urls_stored:
-    st.header("Provide the collection name for your videos")
-    collection_name = st.text_input("", placeholder="One collection name", label_visibility="collapsed")
+    st.sidebar.write("Enter video collection name")
+    collection_name = st.sidebar.text_input("", placeholder="One collection name", label_visibility="collapsed")
     st.subheader("Provide the YouTube Video URL")
     video_url = st.text_input("", placeholder="Paste here", label_visibility="collapsed")
-    if st.button("Add Video URL to Library"):
+    if st.button("Add video URL to library"):
         st.session_state.video_urls.append(video_url)
         st.success(f"Video URL {video_url} added! ")
         st.info("Feel free to include additional URLs by entering them above, or continue by clicking the 'Save all video URLs to Database' button below.")
         video_url = ""
 
-    if st.button("Save All Video URLs to Database"):
+    if st.button("Save all video URLs to database"):
         if collection_name != "":
             with st.spinner("Uploading Videos and Indexing..."):
                 st.session_state.video_dict, st.session_state.collection = add_videos_to_index(collection_name, st.session_state.video_urls)
@@ -58,10 +55,13 @@ if not st.session_state.urls_stored:
                 else:
                     st.error("Error uploading videos and indexing. Please try again.")
                     st.session_state.urls_stored = False
-
+        else:
+            st.sidebar.warning("Please provide the collection name.")
 elif st.session_state.first_time:
-    st.success("Video URLs have been successfully saved.")
-    st.session_state.first_time = False
+    col1, col2, col3 = st.columns([1.1,3,5], gap="large")
+    with col1:
+        st.success("Video URLs have been successfully saved.")
+        st.session_state.first_time = False
 
 
 # st.divider()
@@ -196,7 +196,9 @@ if selected_service == "***Delete All***" and st.session_state.urls_stored:
             st.session_state.chat_history = [
             {"role": "bot", "message": "Hello! Feel free to search through the video content. What's your question?"}
         ]
-            st.success("All videos deleted successfully from the index.")
+            col1, col2, col3 = st.columns([1.1,3,5], gap="large")
+            with col1:
+                st.success("All videos deleted successfully from the index.")
 
 st.sidebar.divider()
 if st.sidebar.button("Check collection") and st.session_state.collection_variables:
