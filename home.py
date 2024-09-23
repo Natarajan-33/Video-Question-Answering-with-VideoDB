@@ -40,25 +40,29 @@ if not st.session_state.urls_stored:
     video_url = st.text_input("", placeholder="Paste here", label_visibility="collapsed")
     if st.button("Add video URL to library"):
         st.session_state.video_urls.append(video_url)
-        st.success(f"Video URL {video_url} added! ")
-        st.info("Feel free to include additional URLs by entering them above, or continue by clicking the 'Save all video URLs to Database' button below.")
+        col1, col2, col3 = st.columns([2.5,3,2], gap="large")
+        with col1:
+            st.success(f"Video URL {video_url} added! ")
+        col1, col2, col3 = st.columns([3.5,1,2], gap="large")
+        with col1:
+            st.info("Feel free to include additional URLs by entering them above, or continue by clicking the 'Save all video URLs to Database' button below.")
         video_url = ""
 
     if st.button("Save all video URLs to database"):
         if collection_name != "":
-            with st.spinner("Uploading Videos and Indexing..."):
-                st.session_state.video_dict, st.session_state.collection = add_videos_to_index(collection_name, st.session_state.video_urls)
-                if st.session_state.video_dict != None:
-                    st.success("Videos uploaded and indexed successfully!")
-                    st.session_state.urls_stored = True
-                    st.session_state.collection_variables = True
-                else:
+            st.session_state.video_dict, st.session_state.collection = add_videos_to_index(collection_name, st.session_state.video_urls)
+            if st.session_state.video_dict != None:
+                st.session_state.urls_stored = True
+                st.session_state.collection_variables = True
+            else:
+                col1, col2, col3 = st.columns([2.1,3,2], gap="large")
+                with col1:
                     st.error("Error uploading videos and indexing. Please try again.")
-                    st.session_state.urls_stored = False
+                st.session_state.urls_stored = False
         else:
             st.sidebar.warning("Please provide the collection name.")
 elif st.session_state.first_time:
-    col1, col2, col3 = st.columns([1.1,3,5], gap="large")
+    col1, col2, col3 = st.columns([2.1,3,2], gap="large")
     with col1:
         st.success("Video URLs have been successfully saved.")
         st.session_state.first_time = False
