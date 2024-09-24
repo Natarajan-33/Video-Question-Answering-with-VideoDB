@@ -1,0 +1,79 @@
+.bot-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    font-size: 26px;
+    font-weight: bold;
+    color: #1f1f1f;
+    /* Strong shadow */
+    background: linear-gradient(90deg, #15cbd1, #fd9644);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* Gradient text */
+    padding: 15px;
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Apply float and glow animations only on hover */
+.bot-header:hover {
+    animation: float 4s ease-in-out infinite, glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes glow {
+    0% {
+        text-shadow: 0 0 10px #15cbd1, 0 0 20px #15cbd1, 0 0 30px #15cbd1;
+    }
+
+    100% {
+        text-shadow: 0 0 20px #fd9644, 0 0 30px #fd9644, 0 0 40px #fd9644;
+    }
+}
+
+.bot-header::before {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 4px;
+    background-color: #fd9644;
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.8;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Line animation on hover */
+.bot-header:hover::before {
+    animation: grow-line 2s ease-in-out infinite;
+}
+
+@keyframes grow-line {
+    0% {
+        width: 50px;
+    }
+
+    50% {
+        width: 150px;
+    }
+
+    100% {
+        width: 50px;
+    }
+}

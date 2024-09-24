@@ -7,7 +7,24 @@ st.set_page_config(
     page_title="Video Insight Bot🤖", layout="wide", initial_sidebar_state="auto"
 )
 
-st.sidebar.title("Video Insight Bot🤖")
+# Load the CSS file
+def load_css(css_file):
+    with open(css_file) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Call the function to load the styles
+load_css("static/styles.css")
+
+# Now render the text with the CSS class applied
+st.sidebar.markdown(
+    """
+    <div class="bot-header">
+        Video Insight Bot🤖
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 st.sidebar.divider()
 
 def setup_session_variables():
