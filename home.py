@@ -27,62 +27,134 @@ st.sidebar.markdown(
 
 st.sidebar.divider()
 
-def setup_session_variables():
-    # if "chat_history" not in st.session_state:
-    #     st.session_state.chat_history = [
-    #         {"role": "bot", "message": "Hello! Feel free to search through the video content. What's your question?"}
-    #     ]
-    if "video_urls" not in st.session_state:
-        st.session_state.video_urls = []
-    if "urls_stored" not in st.session_state:
-        st.session_state.urls_stored = False
-    if "first_time" not in st.session_state:
-        st.session_state.first_time = True
-    if "collection" not in st.session_state:
-        st.session_state.collection = None
-    if "collection_variables" not in st.session_state:
-        st.session_state.collection_variables = False
-    if "video_dict" not in st.session_state:
-        st.session_state.video_dict = {}
-    if 'chat_histories' not in st.session_state:
-        st.session_state.chat_histories = {}  # Stores chat histories for each video
+# def setup_session_variables():
+#     # if "chat_history" not in st.session_state:
+#     #     st.session_state.chat_history = [
+#     #         {"role": "bot", "message": "Hello! Feel free to search through the video content. What's your question?"}
+#     #     ]
+#     if "video_urls" not in st.session_state:
+#         st.session_state.video_urls = []
+#     if "urls_stored" not in st.session_state:
+#         st.session_state.urls_stored = False
+#     if "first_time" not in st.session_state:
+#         st.session_state.first_time = True
+#     if "collection" not in st.session_state:
+#         st.session_state.collection = None
+#     if "collection_variables" not in st.session_state:
+#         st.session_state.collection_variables = False
+#     if "video_dict" not in st.session_state:
+#         st.session_state.video_dict = {}
+#     if 'chat_histories' not in st.session_state:
+#         st.session_state.chat_histories = {}  # Stores chat histories for each video
 
 
-setup_session_variables()
+# setup_session_variables()
+
+# if not st.session_state.urls_stored:
+#     st.sidebar.write("Enter video collection name")
+#     collection_name = st.sidebar.text_input("", placeholder="One collection name", label_visibility="collapsed")
+#     st.subheader("Provide the YouTube Video URL")
+#     col1, col2, col3 = st.columns([2.5,3,2])
+#     with col1:
+#         video_url = st.text_input("", placeholder="Paste here", label_visibility="collapsed")
+#     with col2:       
+#         if st.button("Add video URL to library"):
+#             st.session_state.video_urls.append(video_url)
+#             col1, col2, col3 = st.columns([2.5,3,2], gap="large")
+#             with col1:
+#                 st.success(f"Video URL {video_url} added! ")
+#             col1, col2, col3 = st.columns([3.5,1,2], gap="large")
+#             with col1:
+#                 st.info("Feel free to include additional URLs by entering them above, or continue by clicking the 'Save the library to Database' button below.")
+#             video_url = ""
+
+#     st.divider()
+#     if st.button("Save the library to database"):
+#         if collection_name != "":
+#             st.session_state.video_dict, st.session_state.collection = add_videos_to_index(collection_name, st.session_state.video_urls)
+#             if st.session_state.video_dict != None:
+#                 st.session_state.urls_stored = True
+#                 st.session_state.collection_variables = True
+#             else:
+#                 col1, col2, col3 = st.columns([2.1,3,2], gap="large")
+#                 with col1:
+#                     st.error("Error uploading videos and indexing. Please try again.")
+#                 st.session_state.urls_stored = False
+#         else:
+#             st.sidebar.warning("Please provide the collection name.")
+# elif st.session_state.first_time:
+#     col1, col2, col3 = st.columns([2.1,3,2], gap="large")
+#     with col1:
+#         st.success("Video URLs have been successfully saved.")
+#         st.session_state.first_time = False
+
+# Initialize session state variables if they don't exist
+if 'video_urls' not in st.session_state:
+    st.session_state.video_urls = []
+if 'video_url' not in st.session_state:
+    st.session_state.video_url = ""
+if 'collection_name' not in st.session_state:
+    st.session_state.collection_name = ""
+if 'urls_stored' not in st.session_state:
+    st.session_state.urls_stored = False
+if 'first_time' not in st.session_state:
+    st.session_state.first_time = True
+if 'video_dict' not in st.session_state:
+    st.session_state.video_dict = None
+if 'collection' not in st.session_state:
+    st.session_state.collection = None
+if 'collection_variables' not in st.session_state:
+    st.session_state.collection_variables = False
+if 'chat_histories' not in st.session_state:
+    st.session_state.chat_histories = {}  # Stores chat histories for each video
+
+def add_video_url():
+    if st.session_state.video_url != "":
+        st.session_state.video_urls.append(st.session_state.video_url)
+        col1, _, _ = st.columns([2.5, 3, 2], gap="large")
+        with col1:
+            st.success(f"Video URL {st.session_state.video_url} added!")
+        col1, _, _ = st.columns([3.5, 1, 2], gap="large")
+        with col1:
+            st.info("Feel free to include additional URLs by entering them below, or continue by clicking the 'Save the library to Database' button below.")
+        st.session_state.video_url = ""
+
+def save_library():
+    if st.session_state.collection_name != "":
+        # Assuming add_videos_to_index is defined elsewhere
+        st.session_state.video_dict, st.session_state.collection = add_videos_to_index(
+            st.session_state.collection_name, st.session_state.video_urls)
+        if st.session_state.video_dict is not None:
+            st.session_state.urls_stored = True
+            st.session_state.collection_variables = True
+        else:
+            col1, _, _ = st.columns([2.1, 3, 2], gap="large")
+            with col1:
+                st.error("Error uploading videos and indexing. Please try again.")
+            st.session_state.urls_stored = False
+    else:
+        col1, _, _ = st.columns([2.1, 1, 2], gap="large")
+        with col1:
+            st.warning("Please provide the collection name and then click the 'Save the library to Database' button to continue.")
 
 if not st.session_state.urls_stored:
     st.sidebar.write("Enter video collection name")
-    collection_name = st.sidebar.text_input("", placeholder="One collection name", label_visibility="collapsed")
+    st.sidebar.text_input("", placeholder="One collection name", label_visibility="collapsed", key="collection_name")
     st.subheader("Provide the YouTube Video URL")
-    video_url = st.text_input("", placeholder="Paste here", label_visibility="collapsed")
-    if st.button("Add video URL to library"):
-        st.session_state.video_urls.append(video_url)
-        col1, col2, col3 = st.columns([2.5,3,2], gap="large")
-        with col1:
-            st.success(f"Video URL {video_url} added! ")
-        col1, col2, col3 = st.columns([3.5,1,2], gap="large")
-        with col1:
-            st.info("Feel free to include additional URLs by entering them above, or continue by clicking the 'Save all video URLs to Database' button below.")
-        video_url = ""
-
-    if st.button("Save all video URLs to database"):
-        if collection_name != "":
-            st.session_state.video_dict, st.session_state.collection = add_videos_to_index(collection_name, st.session_state.video_urls)
-            if st.session_state.video_dict != None:
-                st.session_state.urls_stored = True
-                st.session_state.collection_variables = True
-            else:
-                col1, col2, col3 = st.columns([2.1,3,2], gap="large")
-                with col1:
-                    st.error("Error uploading videos and indexing. Please try again.")
-                st.session_state.urls_stored = False
-        else:
-            st.sidebar.warning("Please provide the collection name.")
-elif st.session_state.first_time:
-    col1, col2, col3 = st.columns([2.1,3,2], gap="large")
+    col1, col2, _ = st.columns([2.5, 3, 2])
     with col1:
-        st.success("Video URLs have been successfully saved.")
-        st.session_state.first_time = False
+        st.text_input("", placeholder="Paste here", label_visibility="collapsed", key="video_url")
+    with col2:
+        if st.button("Add video URL to library", on_click=add_video_url):
+            pass
+    st.divider()
+    if st.button("Save the library to Database", on_click=save_library):
+        pass
+# elif st.session_state.first_time:
+#     col1, col2, _ = st.columns([2.1, 3, 2], gap="large")
+#     with col1:
+#         st.success("Video URLs have been successfully saved.")
+#     st.session_state.first_time = False
 
 
 # st.divider()
@@ -217,7 +289,7 @@ if selected_service == "***Delete All***" and st.session_state.urls_stored:
             st.session_state.chat_history = [
             {"role": "bot", "message": "Hello! Feel free to search through the video content. What's your question?"}
         ]
-            col1, col2, col3 = st.columns([1.1,3,5], gap="large")
+            col1, col2, col3 = st.columns([1.5,1,3], gap="large")
             with col1:
                 st.success("All videos deleted successfully from the index.")
 
@@ -225,8 +297,13 @@ st.sidebar.divider()
 if st.sidebar.button("Check collection") and st.session_state.collection_variables:
     video_list = show_collection(st.session_state.collection)
     st.divider()
-    st.write(video_list)
-
+    if video_list:
+        st.subheader("Collection list:")
+        st.write(video_list)
+    else:
+        col1, col2, col3 = st.columns([1.8,1,5], gap="large")
+        with col1:
+            st.info("No videos in the collection.")
 
 
 
