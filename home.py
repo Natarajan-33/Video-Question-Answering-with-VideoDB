@@ -150,11 +150,6 @@ if not st.session_state.urls_stored:
     st.divider()
     if st.button("Save the library to Database", on_click=save_library):
         pass
-# elif st.session_state.first_time:
-#     col1, col2, _ = st.columns([2.1, 3, 2], gap="large")
-#     with col1:
-#         st.success("Video URLs have been successfully saved.")
-#     st.session_state.first_time = False
 
 
 # st.divider()
