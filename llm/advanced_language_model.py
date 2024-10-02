@@ -1,11 +1,26 @@
 import os
 import google.generativeai as genai
 from typing import Any
+import logging
+from dotenv import load_dotenv
 
-# Configure API for Google's generative AI
-gemini_api_key = os.getenv("GEMINI_PRO_KEY")
-genai.configure(api_key=gemini_api_key)
 
+# Load environment variables
+try:
+    load_dotenv(override=True)
+    gemini_api_key = os.getenv("GEMINI_PRO_KEY")
+    if gemini_api_key:
+        # Configure API for Google's generative AI
+        genai.configure(api_key=gemini_api_key)
+        logging.info("API key configured successfully.")
+    else:
+        logging.error("GEMINI_PRO_KEY is not set in the environment variables.")
+        # Raise an exception to halt execution
+        raise RuntimeError("API key configuration failed.")
+    
+except Exception as e:
+    logging.error(f"Error loading environment variables or configuring API key. error={e}")
+    raise  # Re-raise the exception to halt execution
 
 
 safety_settings = [
@@ -43,12 +58,18 @@ def generate_answer_from_context(query: str, context: str) -> Any:
     Returns:
         Any: The generated response from the language model.
     """
-    model = genai.GenerativeModel('gemini-pro', safety_settings=safety_settings)
-    instruction = (
-        "Provide a detailed and accurate response based on the context given. "
-        "If the context is insufficient for a comprehensive answer, request more details. "
-        "Ensure your response is grounded in the provided information."
-    )
-    prompt = f"Instructions: {instruction} \n\nContext: {context}\n\nQuery: {query}"
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        model = genai.GenerativeModel('gemini-pro', safety_settings=safety_settings)
+        instruction = (
+            "Provide a detailed and accurate response based on the context given. "
+            "If the context is insufficient for a comprehensive answer, request more details. "
+            "Ensure your response is grounded in the provided information."
+        )
+        prompt = f"Instructions: {instruction} \n\nContext: {context}\n\nQuery: {query}"
+        response = model.generate_content(prompt)
+        logging.info("LLM responded successfully. fn=generate_answer_from_context")
+        return response.text
+    except Exception as e:
+        logging.error(f"Error occured while generating response from LLM. fn=generate_answer_from_context,error={e}")
+        raise e
+

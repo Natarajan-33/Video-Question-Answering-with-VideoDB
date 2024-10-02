@@ -1,16 +1,26 @@
 import streamlit as st
 from db.database_operations import add_videos_to_index, chat_with_video, stream_video, watch_shorts, transcribe_video, add_subtitles, thumbnail, delete_video_from_index, delete_all_videos_from_index, show_collection
 from llm.advanced_language_model import generate_answer_from_context
-
+from utils.helpers import setup_logging
+import logging
 
 st.set_page_config(
     page_title="Video Insight Bot🤖", layout="wide", initial_sidebar_state="auto"
 )
 
+
+setup_logging('logs/videolens_logs.log')
+
 # Load the CSS file
 def load_css(css_file):
-    with open(css_file) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    try:
+        with open(css_file) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+        logging.info(f"CSS file '{css_file}' loaded successfully. fn= load_css")
+    except Exception as e:
+        logging.error(f"Error loading CSS file '{css_file}'. fn=load_css. Error: {e}")
+
+
 
 # Call the function to load the styles
 load_css("static/styles.css")
@@ -26,67 +36,6 @@ st.sidebar.markdown(
 )
 
 st.sidebar.divider()
-
-# def setup_session_variables():
-#     # if "chat_history" not in st.session_state:
-#     #     st.session_state.chat_history = [
-#     #         {"role": "bot", "message": "Hello! Feel free to search through the video content. What's your question?"}
-#     #     ]
-#     if "video_urls" not in st.session_state:
-#         st.session_state.video_urls = []
-#     if "urls_stored" not in st.session_state:
-#         st.session_state.urls_stored = False
-#     if "first_time" not in st.session_state:
-#         st.session_state.first_time = True
-#     if "collection" not in st.session_state:
-#         st.session_state.collection = None
-#     if "collection_variables" not in st.session_state:
-#         st.session_state.collection_variables = False
-#     if "video_dict" not in st.session_state:
-#         st.session_state.video_dict = {}
-#     if 'chat_histories' not in st.session_state:
-#         st.session_state.chat_histories = {}  # Stores chat histories for each video
-
-
-# setup_session_variables()
-
-# if not st.session_state.urls_stored:
-#     st.sidebar.write("Enter video collection name")
-#     collection_name = st.sidebar.text_input("", placeholder="One collection name", label_visibility="collapsed")
-#     st.subheader("Provide the YouTube Video URL")
-#     col1, col2, col3 = st.columns([2.5,3,2])
-#     with col1:
-#         video_url = st.text_input("", placeholder="Paste here", label_visibility="collapsed")
-#     with col2:       
-#         if st.button("Add video URL to library"):
-#             st.session_state.video_urls.append(video_url)
-#             col1, col2, col3 = st.columns([2.5,3,2], gap="large")
-#             with col1:
-#                 st.success(f"Video URL {video_url} added! ")
-#             col1, col2, col3 = st.columns([3.5,1,2], gap="large")
-#             with col1:
-#                 st.info("Feel free to include additional URLs by entering them above, or continue by clicking the 'Save the library to Database' button below.")
-#             video_url = ""
-
-#     st.divider()
-#     if st.button("Save the library to database"):
-#         if collection_name != "":
-#             st.session_state.video_dict, st.session_state.collection = add_videos_to_index(collection_name, st.session_state.video_urls)
-#             if st.session_state.video_dict != None:
-#                 st.session_state.urls_stored = True
-#                 st.session_state.collection_variables = True
-#             else:
-#                 col1, col2, col3 = st.columns([2.1,3,2], gap="large")
-#                 with col1:
-#                     st.error("Error uploading videos and indexing. Please try again.")
-#                 st.session_state.urls_stored = False
-#         else:
-#             st.sidebar.warning("Please provide the collection name.")
-# elif st.session_state.first_time:
-#     col1, col2, col3 = st.columns([2.1,3,2], gap="large")
-#     with col1:
-#         st.success("Video URLs have been successfully saved.")
-#         st.session_state.first_time = False
 
 # Initialize session state variables if they don't exist
 if 'video_urls' not in st.session_state:
@@ -117,6 +66,7 @@ def add_video_url():
         col1, _, _ = st.columns([3.5, 1, 2], gap="large")
         with col1:
             st.info("Feel free to include additional URLs by entering them below, or continue by clicking the 'Save the library to Database' button below.")
+        logging.INFO(f"Video URL added: {st.session_state.video_url}")
         st.session_state.video_url = ""
 
 def save_library():
@@ -151,7 +101,6 @@ if not st.session_state.urls_stored:
     if st.button("Save the library to Database", on_click=save_library):
         pass
 
-
 # st.divider()
 st.sidebar.subheader("Select a Service:")
 selected_service = st.sidebar.radio(
@@ -164,7 +113,6 @@ selected_service = st.sidebar.radio(
 if selected_service == "***LLM Summary***" and st.session_state.urls_stored:
     st.header(selected_service)
     st.divider()
-    # st.title("Video Insight Bot🤖")
 
     st.subheader("Select URL to chat with")
     video_name = st.selectbox(" ", st.session_state.video_dict.keys(), placeholder="Choose the video to stream",index=None, disabled=False, label_visibility="collapsed", key="chatbot")
@@ -302,8 +250,6 @@ if st.sidebar.button("Check collection") and st.session_state.collection_variabl
 
 
 
-
-# metadata for video selection instead of URL
 # try playing shots videos
 
 
