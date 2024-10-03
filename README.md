@@ -41,7 +41,7 @@ To get started with VideoLens, follow these steps:
 
 ```bash
 # Clone the repository
-git clone https://github.com/YourUsername/VideoLens.git
+git clone https://github.com/Natarajan-33/Video-Question-Answering-with-VideoDB.git
 cd VideoLens
 
 # Create a virtual environment (recommended)
