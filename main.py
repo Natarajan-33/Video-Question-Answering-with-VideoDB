@@ -66,7 +66,7 @@ def add_video_url():
         col1, _, _ = st.columns([3.5, 1, 2], gap="large")
         with col1:
             st.info("Feel free to include additional URLs by entering them below, or continue by clicking the 'Save the library to Database' button below.")
-        logging.INFO(f"Video URL added: {st.session_state.video_url}")
+        logging.info(f"Video URL added: {st.session_state.video_url}")
         st.session_state.video_url = ""
 
 def save_library():

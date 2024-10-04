@@ -49,23 +49,24 @@ def add_videos_to_index(collection_name: str, youtube_urls: List[str]) -> Tuple[
                 try:
                     video = collection.upload(url=url)
                     video_dict[video.name] = video.id
-                    logging.info(f"Video: {video.name}({url}) uploaded successfully. fn=add_videos_to_index")
+                    logging.info(f"Video: {video.name} ({url}) uploaded successfully. fn=add_videos_to_index")
                 except Exception as error:
                     st.write(f"Failed to upload and index {url}. Error: {error}")
-                    logging.error(f"Error uploading and indexing video: {video.name}({url}). fn=add_videos_to_index, error={error}")
+                    logging.error(f"Error uploading and indexing video at URL {url}. fn=add_videos_to_index, error={error}")
                     return None, None
         
         with st.spinner('Indexing spoken words...'):
             for video in collection.get_videos():
                 video.index_spoken_words()
-                
-        st.success(f"Video: {video.name}({url}) uploaded and indexed successfully.")
-        logging.info(f"Video: {video.name}({url}) uploaded and indexed successfully. fn=add_videos_to_index")
+                    
+        st.success(f"All videos in collection '{collection_name}' uploaded and indexed successfully.")
+        logging.info(f"All videos in collection '{collection_name}' uploaded and indexed successfully. fn=add_videos_to_index")
         return video_dict, collection
     
     except Exception as e:
         logging.error(f"Error uploading and indexing videos. fn=add_videos_to_index, error={e}")
         return None, None
+
 
 
 
